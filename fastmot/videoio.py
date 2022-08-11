@@ -70,7 +70,9 @@ class VideoIO:
         self.protocol = self._parse_uri(self.input_uri)
         self.is_live = self.protocol != Protocol.IMAGE and self.protocol != Protocol.VIDEO
         if WITH_GSTREAMER:
-            self.source = cv2.VideoCapture(self._gst_cap_pipeline(), cv2.CAP_GSTREAMER)
+            line = self._gst_cap_pipeline()
+            print("Capture pipeline " + line)
+            self.source = cv2.VideoCapture(line, cv2.CAP_GSTREAMER)
         else:
             self.source = cv2.VideoCapture(self.input_uri)
 
@@ -96,7 +98,9 @@ class VideoIO:
             Path(self.output_uri).parent.mkdir(parents=True, exist_ok=True)
             output_fps = 1 / self.cap_dt
             if WITH_GSTREAMER:
-                self.writer = cv2.VideoWriter(self._gst_write_pipeline(), cv2.CAP_GSTREAMER, 0,
+                line = self._gst_write_pipeline()
+                print("Write pipeline: " + line)
+                self.writer = cv2.VideoWriter(line, cv2.CAP_GSTREAMER, 0,
                                               output_fps, self.size, True)
             else:
                 fourcc = cv2.VideoWriter_fourcc(*'avc1')
@@ -198,14 +202,23 @@ class VideoIO:
                 raise RuntimeError('GStreamer CSI plugin not found')
         elif self.protocol == Protocol.V4L2:
             if 'v4l2src' in gst_elements:
+                #pipeline = (
+                #    'v4l2src device=%s ! '
+                #    'video/x-raw, width=%d, height=%d, '
+                #    'format=YUY2, framerate=%d/1 ! '
+                #    % (
+                #        self.input_uri,
+                #        *self.resolution,
+                #        self.frame_rate
+                #    )
+                #)
                 pipeline = (
                     'v4l2src device=%s ! '
                     'video/x-raw, width=%d, height=%d, '
-                    'format=YUY2, framerate=%d/1 ! '
+                    'format=YUY2 ! '
                     % (
                         self.input_uri,
-                        *self.resolution,
-                        self.frame_rate
+                        *self.resolution
                     )
                 )
             else:
@@ -228,13 +241,14 @@ class VideoIO:
             h264_encoder = 'x264enc pass=4'
         else:
             raise RuntimeError('GStreamer H.264 encoder not found')
-        pipeline = (
-            'appsrc ! autovideoconvert ! %s ! qtmux ! filesink location=%s '
-            % (
-                h264_encoder,
-                self.output_uri
-            )
-        )
+#        pipeline = (
+#            'appsrc ! autovideoconvert ! %s ! qtmux ! filesink location=%s '
+#            % (
+#                h264_encoder,
+#                self.output_uri
+#            )
+#        )
+        pipeline = 'appsrc ! autovideoconvert ! xvimagesink'
         return pipeline
 
     def _capture_frames(self):

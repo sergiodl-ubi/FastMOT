@@ -7,7 +7,7 @@ L4T_VERSION=$(dpkg-query --showformat='${Version}' --show nvidia-l4t-core | cut 
 # Jetpack>=4.4 (OpenCV, CUDA, TensorRT) is required
 if dpkg --compare-versions $L4T_VERSION ge 32.6; then
     TF_VERSION=1.15.5
-    NV_VERSION=21.6
+    NV_VERSION=21.7
     JP_VERSION=46
 elif dpkg --compare-versions $L4T_VERSION ge 32.5; then
     TF_VERSION=1.15.4
