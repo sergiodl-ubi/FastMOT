@@ -3,6 +3,28 @@
 
 <img src="assets/dense_demo.gif" width="400"/> <img src="assets/aerial_demo.gif" width="400"/>
 
+## Local Personal Notes
+
+Working version with Jetpack 4.6.2 and L4T 32.7.2
+
+- Output is shown live in a window through gstreamer's xvimagesink
+  - The original repository only outputs to a file. There's no code for any other type of output (rtp or http)
+- Input framerate have been removed from the gstreamer pipeline, it can already recognize it from source.
+  - Default configuration will break the gstreamer pipeline with obscure error message "Internal data stream error" in the case that the input video parameters do not coincide to source's metadata.
+- I haven't been able make it work with pipenv, I had to install scipy, numba, cupy and tensorflow manually
+
+# Installing numba
+
+To install numba, you can follow this tutorial. The fast method (pip packages) works, but **DO NOT INSTALL Cython, INSTALL cython package** otherwise you will not be able to install tensorflow later.
+
+[Jetson nano tricks (epicmario7133)](https://github.com/epicmario7133/jetson-nano-tricks/blob/main/README.md) [archive not working yet]()
+
+# Installing tensorflow 1.x
+
+Use the next command, this applies to Jetpack 4.6.2
+
+`sudo pip3 install --pre --extra-index-url https://developer.download.nvidia.com/compute/redist/jp/v461 'tensorflow<2'`
+
 ## News
   - (2021.8.17) Support multi-class tracking
   - (2021.7.4) Support yolov4-p5 and yolov4-p6
